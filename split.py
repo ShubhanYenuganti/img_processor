@@ -11,12 +11,12 @@ def extract_frames(path, output_dir, interval = 30):
         if not ret:
             break
 
-        while frame_count % interval == 0:
+        if frame_count % interval == 0:
             cv2.imwrite(f"{output_dir}/frame_{saved_count}.jpg", frame)
             saved_count += 1
         
         frame_count += 1
-    
+        
     cap.release()
 
     print(f"Extracted {saved_count} frames")

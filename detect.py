@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from split import extract_frames
 import boto3
+import json
 import cv2
 import os
 load_dotenv()
@@ -24,6 +25,7 @@ def detect_labels(img_path):
 if __name__ == "__main__": 
     video_path = "input/video.mp4"
     frame_dir = "frames"
+    labels_dir = "labels"
 
     # Extract frames
     extract_frames(video_path, frame_dir)
@@ -34,3 +36,7 @@ if __name__ == "__main__":
             img_path = os.path.join(frame_dir, file)
 
             labels = detect_labels(img_path)
+
+            labels_file = os.path.join(labels_dir, file.replace(".jpg", ".json"))
+            with open(labels_file, 'w') as f:
+                json.dump(labels, f, indent=2)
