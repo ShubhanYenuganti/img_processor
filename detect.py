@@ -17,10 +17,10 @@ def detect_labels(img_path):
     with open(img_path, 'rb') as img:
         image_bytes = img.read()
         response = reko_client.detect_labels(Image={'Bytes': image_bytes},
-                                            minConfidence = 65,
-                                            Attributes = ['ALL']
+                                             MaxLabels = 10,
+                                             MinConfidence = 65,
                                             )
-    return response['labels']
+    return response['Labels']
 
 if __name__ == "__main__": 
     video_path = "input/video.mp4"
