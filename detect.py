@@ -22,10 +22,31 @@ def detect_labels(img_path):
                                             )
     return response['Labels']
 
+def annotate_img(img_path, labels):
+    image = cv2.imread(img_path)
+    H, W, _ = image.shape
+
+    for label in labels:
+        name = label['Name']
+        for instance in label.get("Instances", []):
+            if "BoundingBox" in instance:
+                box = instance["BoundingBox"]
+                x1 = int(box['Left'] * W)
+                y1 = int(box['Top'] * H)
+                width = int(box['Width'] * W)
+                height = int(box['Height'] * H)
+
+                cv2.rectangle(image, (x1, y1), (x1 + width, y1 + height), (0, 255, 0), 3)
+                caption = f"{name} with {int(instance['Confidence'])} %"
+                cv2.putText(image, caption, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,  0.5, (0, 255, 0), 2)
+
+    return image
+
 if __name__ == "__main__": 
     video_path = "input/video.mp4"
     frame_dir = "frames"
     labels_dir = "labels"
+    annotations_dir = "annotations"
 
     # Extract frames
     extract_frames(video_path, frame_dir)
@@ -40,3 +61,8 @@ if __name__ == "__main__":
             labels_file = os.path.join(labels_dir, file.replace(".jpg", ".json"))
             with open(labels_file, 'w') as f:
                 json.dump(labels, f, indent=2)
+
+            annotated = annotate_img(img_path, labels)
+            annotated_path = os.path.join(annotations_dir, file.replace(".jpg", "_annotated.jpg"))
+            cv2.imwrite(annotated_path, annotated)
+            print(f"Processed {file} with labels and annotations.")
